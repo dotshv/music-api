@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}{{ code }} - {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="error-page">
+  <div>
+    <div class="error-page__code">{{ code }}</div>
+    <h1>{{ message }}</h1>
+    <p>{% if code == 404 %}The page you're looking for doesn't exist or has moved.{% else %}Please try again in a moment.{% endif %}</p>
+    <a class="btn btn--primary" href="/">Back to home</a>
+  </div>
+</section>
+{% endblock %}

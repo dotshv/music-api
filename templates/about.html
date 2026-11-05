@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}About - {{ site_name }}{% endblock %}
+{% block description %}What {{ site_name }} is, how it works and the ground rules.{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="container">
+    <h1>About</h1>
+    <p>A small REST API for searching songs and streaming audio, made for bots and apps.</p>
+  </div>
+</section>
+
+<div class="container">
+  <div class="prose">
+    <h2>What it is</h2>
+    <p>{{ site_name }} gives developers search, lookup and audio streaming over plain HTTP. Telegram and Discord bots, web apps and scripts can use it without an account or an API key.</p>
+
+    <h2>How it works</h2>
+    <p>Search results come from public music catalogs. When you request a stream, the audio is found on demand and passed through to you. Nothing is stored on the server except short-lived cached search results.</p>
+
+    <h2>Fair use</h2>
+    <p>Requests are limited per IP address{% if rate_limit %} ({{ rate_limit }} per minute){% endif %} so everyone gets a fast API. Please cache results where you can and don't resell access to the API. See the <a href="/developers#limits">rate limit docs</a> for details.</p>
+
+    <h2>Independent project</h2>
+    <p>{{ site_name }} is built and maintained independently. It isn't affiliated with, endorsed by or sponsored by Spotify or any record label. All music, names and artwork belong to their respective owners.</p>
+
+    {% if support_url %}
+    <h2>Get in touch</h2>
+    <p>Found a bug or need something added? <a href="{{ support_url }}" target="_blank" rel="noopener">Message us</a>.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

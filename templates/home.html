@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% from "partials/icons.html" import icon %}
+
+{% block title %}{{ site_name }} - Search songs and stream audio over HTTP{% endblock %}
+{% block description %}A simple REST API for music. Search songs, resolve Spotify links and stream audio with plain GET requests. JSON responses, CORS enabled, no API key.{% endblock %}
+
+{% block head %}
+  <meta property="og:site_name" content="{{ site_name }}">
+  <meta property="og:title" content="{{ site_name }}">
+  <meta property="og:description" content="Search songs and stream audio with plain GET requests. No API key.">
+  <meta property="og:url" content="{{ base_url }}/">
+{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="container hero__grid">
+    <div>
+      <h1>A simple REST API for music.</h1>
+      <p class="hero__lead">Search songs, resolve links and stream audio with plain GET requests. JSON responses, open CORS and no API key.</p>
+
+      <div class="hero__actions">
+        <a class="btn btn--primary" href="/developers">Read the docs</a>
+        <a class="btn btn--ghost" href="/playground">Try it live</a>
+      </div>
+
+      <div class="base-url">
+        <span class="base-url__label">Base URL</span>
+        <code id="baseUrl">{{ base_url }}/api/v1</code>
+        <button class="icon-btn" type="button" data-copy="#baseUrl" aria-label="Copy base URL">{{ icon("copy") }}</button>
+      </div>
+    </div>
+
+    <div class="terminal" aria-label="Example request and response">
+      <div class="terminal__bar"><i></i><i></i><i></i><span>Terminal</span></div>
+<pre class="terminal__body"><span class="c">$</span> curl "{{ base_url }}/api/v1/songs?query=kesariya&amp;limit=1"
+
+{
+  <span class="n">"status"</span>: <span class="s">"success"</span>,
+  <span class="n">"count"</span>: 1,
+  <span class="n">"results"</span>: [{
+    <span class="n">"id"</span>: <span class="s">"4cOdK2wGLETKBW3PvgPWqT"</span>,
+    <span class="n">"title"</span>: <span class="s">"Kesariya"</span>,
+    <span class="n">"artist"</span>: <span class="s">"Arijit Singh"</span>,
+    <span class="n">"duration_sec"</span>: 268,
+    <span class="n">"stream_url"</span>: <span class="s">"{{ base_url }}/api/v1/songs/4cO…/stream"</span>
+  }]
+}</pre>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section__head">
+      <h2>Four endpoints. That's the whole API.</h2>
+      <p>Every endpoint is a GET request. Responses are JSON, except the stream which returns audio.</p>
+    </div>
+
+    <div class="endpoint-list">
+      <a class="endpoint-row" href="/developers#search">
+        <span class="method">GET</span><code>/songs</code>
+        <p>Search the catalog by song title or artist.</p>
+      </a>
+      <a class="endpoint-row" href="/developers#song">
+        <span class="method">GET</span><code>/songs/{id}</code>
+        <p>Get title, artist and cover art for one song.</p>
+      </a>
+      <a class="endpoint-row" href="/developers#stream">
+        <span class="method">GET</span><code>/songs/{id}/stream</code>
+        <p>Stream the audio. Use it as the source for a player or a voice bot.</p>
+      </a>
+      <a class="endpoint-row" href="/developers#resolve">
+        <span class="method">GET</span><code>/resolve</code>
+        <p>Turn a song title or a Spotify link into a single song.</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section__head">
+      <h2>Built for bots and apps.</h2>
+    </div>
+
+    <div class="features">
+      <article class="feature">
+        <div class="feature__icon">{{ icon("code") }}</div>
+        <div>
+          <h3>Plain JSON</h3>
+          <p>One consistent response shape for songs and errors, with correct HTTP status codes.</p>
+        </div>
+      </article>
+      <article class="feature">
+        <div class="feature__icon">{{ icon("share") }}</div>
+        <div>
+          <h3>CORS enabled</h3>
+          <p>Call the API straight from a browser app. No proxy needed.</p>
+        </div>
+      </article>
+      <article class="feature">
+        <div class="feature__icon">{{ icon("bolt") }}</div>
+        <div>
+          <h3>No API key</h3>
+          <p>Make your first request right now. There is nothing to sign up for.</p>
+        </div>
+      </article>
+      <article class="feature">
+        <div class="feature__icon">{{ icon("queue") }}</div>
+        <div>
+          <h3>Clear rate limits</h3>
+          <p>{% if rate_limit %}{{ rate_limit }} requests per minute per IP, with <code class="inline">X-RateLimit</code> headers on every response.{% else %}No rate limit is currently applied.{% endif %}</p>
+        </div>
+      </article>
+      <article class="feature">
+        <div class="feature__icon">{{ icon("music") }}</div>
+        <div>
+          <h3>Audio streaming</h3>
+          <p>Every song comes with a ready <code class="inline">stream_url</code>. If one source is down, another is used.</p>
+        </div>
+      </article>
+      <article class="feature">
+        <div class="feature__icon">{{ icon("search") }}</div>
+        <div>
+          <h3>Spotify links work</h3>
+          <p>Paste a track link or URI into <code class="inline">/resolve</code> and get the song back.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container split">
+    <div class="split__text">
+      <h2>Make a request in any language.</h2>
+      <p>Search for a song, then hand its <code class="inline">stream_url</code> to your player or bot.</p>
+      <a class="btn btn--ghost" href="/playground">Open the playground</a>
+    </div>
+
+    <div class="tabs" data-tabs>
+      <div class="tabs__list" role="tablist" aria-label="Language">
+        <button class="tabs__tab" role="tab" type="button" id="tab-curl" aria-controls="panel-curl" aria-selected="true">curl</button>
+        <button class="tabs__tab" role="tab" type="button" id="tab-py" aria-controls="panel-py" aria-selected="false" tabindex="-1">Python</button>
+        <button class="tabs__tab" role="tab" type="button" id="tab-js" aria-controls="panel-js" aria-selected="false" tabindex="-1">JavaScript</button>
+      </div>
+<pre class="code tabs__panel" role="tabpanel" id="panel-curl" aria-labelledby="tab-curl"><span class="c"># Search</span>
+curl "{{ base_url }}/api/v1/songs?query=kesariya&amp;limit=1"
+
+<span class="c"># Save the audio</span>
+curl -L "{{ base_url }}/api/v1/songs/{id}/stream" -o song.audio</pre>
+<pre class="code tabs__panel" role="tabpanel" id="panel-py" aria-labelledby="tab-py" hidden>import requests
+
+BASE = "{{ base_url }}/api/v1"
+
+r = requests.get(f"{BASE}/songs", params={"query": "kesariya", "limit": 1}, timeout=10)
+r.raise_for_status()
+
+song = r.json()["results"][0]
+print(song["title"], "-", song["artist"])
+print(song["stream_url"])</pre>
+<pre class="code tabs__panel" role="tabpanel" id="panel-js" aria-labelledby="tab-js" hidden>const BASE = "{{ base_url }}/api/v1";
+
+const res = await fetch(`${BASE}/songs?query=kesariya&amp;limit=1`);
+if (!res.ok) throw new Error((await res.json()).message);
+
+const { results } = await res.json();
+const audio = new Audio(results[0].stream_url);
+audio.play();</pre>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="container">
+    <h2>Make your first request.</h2>
+    <p>Open the playground, pick an endpoint and see the real response.</p>
+    <a class="btn btn--primary" href="/playground">Try it live</a>
+  </div>
+</section>
+{% endblock %}

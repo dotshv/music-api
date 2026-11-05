@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% from "partials/icons.html" import icon %}
+
+{% block title %}Playground - {{ site_name }}{% endblock %}
+{% block description %}Send real requests to the API and see the response.{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="container">
+    <h1>Playground</h1>
+    <p>Pick an endpoint, send a real request and see the response. Nothing to set up.</p>
+  </div>
+</section>
+
+<div class="container playground">
+  <form class="pg-form" id="pgForm" autocomplete="off">
+    <div class="field">
+      <label for="pgEndpoint">Endpoint</label>
+      <select id="pgEndpoint">
+        <option value="search">GET /songs</option>
+        <option value="song">GET /songs/{id}</option>
+        <option value="stream">GET /songs/{id}/stream</option>
+        <option value="resolve">GET /resolve</option>
+      </select>
+    </div>
+
+    <div class="field" data-for="search resolve">
+      <label for="pgQuery">query</label>
+      <input id="pgQuery" type="text" value="kesariya" maxlength="200" placeholder="Song title or Spotify link">
+    </div>
+
+    <div class="field" data-for="search">
+      <label for="pgLimit">limit</label>
+      <input id="pgLimit" type="number" min="1" max="25" value="3">
+    </div>
+
+    <div class="field" data-for="song stream" hidden>
+      <label for="pgId">id</label>
+      <input id="pgId" type="text" placeholder="Run a search first, the id fills in">
+      <p class="field__hint" id="pgIdHint"></p>
+    </div>
+
+    <button class="btn btn--primary" type="submit" id="pgSend">Send request</button>
+  </form>
+
+  <div class="pg-out">
+    <div class="pg-url">
+      <code id="pgUrl">{{ base_url }}/api/v1/songs?query=kesariya&amp;limit=3</code>
+      <button class="icon-btn" type="button" data-copy="#pgUrl" aria-label="Copy request URL">{{ icon("copy") }}</button>
+    </div>
+
+    <div class="pg-status" id="pgStatus" role="status" aria-live="polite">Ready</div>
+
+    <div class="pg-audio" id="pgAudioWrap" hidden>
+      <audio id="pgAudio" controls preload="none"></audio>
+    </div>
+
+    <pre class="code pg-response" id="pgResponse" aria-label="Response">Send a request to see the response here.</pre>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="/static/js/playground.js" defer></script>
+{% endblock %}

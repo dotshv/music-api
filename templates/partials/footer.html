@@ -1,0 +1,39 @@
+{% from "partials/icons.html" import logo %}
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__grid">
+      <div class="site-footer__about">
+        <a class="brand" href="/">{{ logo(28) }}<span>{{ site_name }}</span></a>
+        <p>A simple REST API to search songs and stream audio. No key, no sign-up.</p>
+      </div>
+
+      <nav aria-label="Developers">
+        <h2>Developers</h2>
+        <a href="/developers">Documentation</a>
+        <a href="/playground">Playground</a>
+        {% if docs_enabled %}<a href="/docs">Swagger UI</a>{% endif %}
+        {% if docs_enabled %}<a href="/openapi.json">OpenAPI spec</a>{% endif %}
+      </nav>
+
+      <nav aria-label="Reference">
+        <h2>Reference</h2>
+        <a href="/developers#search">Search songs</a>
+        <a href="/developers#stream">Stream audio</a>
+        <a href="/developers#limits">Rate limits</a>
+        <a href="/developers#errors">Errors</a>
+      </nav>
+
+      <nav aria-label="Company">
+        <h2>Company</h2>
+        <a href="/about">About</a>
+        <a href="/health">Status</a>
+        {% if support_url %}<a href="{{ support_url }}" rel="noopener" target="_blank">Contact</a>{% endif %}
+      </nav>
+    </div>
+
+    <div class="site-footer__bottom">
+      <span>&copy; {{ year }} {{ site_name }}</span>
+      <span>An independent project. Not affiliated with Spotify or any record label.</span>
+    </div>
+  </div>
+</footer>

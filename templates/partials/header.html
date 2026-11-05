@@ -1,0 +1,27 @@
+{% from "partials/icons.html" import icon, logo %}
+{% set nav_items = [
+  ("home", "/", "Home"),
+  ("developers", "/developers", "Docs"),
+  ("playground", "/playground", "Playground"),
+  ("about", "/about", "About"),
+] %}
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="brand" href="/" aria-label="{{ site_name }} home">
+      {{ logo(30) }}
+      <span>{{ site_name }}</span>
+    </a>
+
+    <nav class="site-nav" id="siteNav" aria-label="Main">
+      {% for key, href, label in nav_items %}
+        <a href="{{ href }}" {% if page == key %}aria-current="page"{% endif %}>{{ label }}</a>
+      {% endfor %}
+      {% if docs_enabled %}<a href="/docs">Swagger</a>{% endif %}
+      <a class="btn btn--primary btn--sm site-nav__cta" href="/playground">Try it live</a>
+    </nav>
+
+    <button class="nav-toggle" id="navToggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="siteNav">
+      {{ icon("menu") }}
+    </button>
+  </div>
+</header>

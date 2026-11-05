@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}Documentation - {{ site_name }}{% endblock %}
+{% block description %}How to search songs, resolve links and stream audio with the REST API. Parameters, responses, rate limits and errors.{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="container">
+    <h1>Documentation</h1>
+    <p>Everything is a GET request under one base URL. Responses are JSON, except the stream which returns audio. No API key.</p>
+  </div>
+</section>
+
+<div class="container docs">
+  <nav class="docs__toc" aria-label="On this page">
+    <a href="#start">Getting started</a>
+    <a href="#search">Search songs</a>
+    <a href="#song">Get a song</a>
+    <a href="#stream">Stream audio</a>
+    <a href="#resolve">Resolve a link</a>
+    <a href="#object">Song object</a>
+    <a href="#limits">Rate limits</a>
+    <a href="#errors">Errors</a>
+    {% if docs_enabled %}<a href="/docs">Swagger UI</a>{% endif %}
+  </nav>
+
+  <div>
+    <section class="doc-block" id="start">
+      <h2>Getting started</h2>
+      <p>Send a request, get JSON back. CORS is enabled, so you can also call the API from a browser.</p>
+      <h3>Base URL</h3>
+<pre class="code">{{ base_url }}/api/v1</pre>
+      <h3>First request</h3>
+<pre class="code">curl "{{ base_url }}/api/v1/songs?query=kesariya&amp;limit=1"</pre>
+      <p style="margin-top:14px">Not sure what to send? Try it in the <a class="text-link" href="/playground">playground</a>.</p>
+    </section>
+
+    <section class="doc-block" id="search">
+      <h2>Search songs</h2>
+      <p>Search the catalog by song title or artist name.</p>
+      <div class="endpoint"><span class="method">GET</span> /songs</div>
+
+      <h3>Query parameters</h3>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Name</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>query</td><td>Required. Song title or artist, up to 120 characters.</td></tr>
+            <tr><td>limit</td><td>Optional. Number of results, 1 to 25. Default 10.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Response</h3>
+<pre class="code">{
+  <span class="n">"status"</span>: <span class="s">"success"</span>,
+  <span class="n">"query"</span>: <span class="s">"kesariya"</span>,
+  <span class="n">"count"</span>: 1,
+  <span class="n">"results"</span>: [ <span class="c">/* song objects */</span> ]
+}</pre>
+    </section>
+
+    <section class="doc-block" id="song">
+      <h2>Get a song</h2>
+      <p>Title and cover art for a Spotify track ID or link.</p>
+      <div class="endpoint"><span class="method">GET</span> /songs/{id}</div>
+
+      <h3>Response</h3>
+<pre class="code">{
+  <span class="n">"status"</span>: <span class="s">"success"</span>,
+  <span class="n">"data"</span>: { <span class="c">/* song object */</span> }
+}</pre>
+    </section>
+
+    <section class="doc-block" id="stream">
+      <h2>Stream audio</h2>
+      <p>Returns the audio itself. Use the <code class="inline">stream_url</code> from any song object as the source of an audio element, or give it to your bot's voice player.</p>
+      <div class="endpoint"><span class="method">GET</span> /songs/{id}/stream</div>
+
+      <h3>Query parameters</h3>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Name</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>source</td><td>Optional. <code class="inline">spotify</code>, <code class="inline">saavn</code> or <code class="inline">itunes</code>. Already set in every <code class="inline">stream_url</code>.</td></tr>
+            <tr><td>q</td><td>Optional. Title and artist, used to find audio when no direct source exists. Already included in every <code class="inline">stream_url</code>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:14px">The content type depends on the source, for example <code class="inline">audio/ogg</code>, <code class="inline">audio/webm</code> or <code class="inline">audio/mp4</code>. Streams aren't cached.</p>
+    </section>
+
+    <section class="doc-block" id="resolve">
+      <h2>Resolve a link</h2>
+      <p>Turns a Spotify track link, a Spotify URI or a plain song title into one song. Handy when a user pastes or types something and you want a single result.</p>
+      <div class="endpoint"><span class="method">GET</span> /resolve</div>
+
+      <h3>Query parameters</h3>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Name</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>query</td><td>Required. A song title, or a Spotify track link or URI.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Example</h3>
+<pre class="code">curl "{{ base_url }}/api/v1/resolve?query=https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT"
+
+{
+  <span class="n">"status"</span>: <span class="s">"success"</span>,
+  <span class="n">"song"</span>: { <span class="c">/* song object */</span> }
+}</pre>
+    </section>
+
+    <section class="doc-block" id="object">
+      <h2>Song object</h2>
+      <p>Every endpoint that returns a song uses this shape.</p>
+      <div class="table-wrap" style="margin-top:18px">
+        <table class="table">
+          <thead><tr><th>Field</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>id</td><td>Track ID. Use it in <code class="inline">/songs/{id}</code>.</td></tr>
+            <tr><td>title</td><td>Song title.</td></tr>
+            <tr><td>artist</td><td>Artist names, comma separated. May be empty.</td></tr>
+            <tr><td>album</td><td>Album name. May be empty.</td></tr>
+            <tr><td>thumbnail</td><td>Cover art URL. May be empty.</td></tr>
+            <tr><td>duration_sec</td><td>Length in seconds, or <code class="inline">null</code> if unknown.</td></tr>
+            <tr><td>source</td><td>Where the result came from: Spotify or Catalog.</td></tr>
+            <tr><td>stream_url</td><td>Ready-to-use audio URL.</td></tr>
+            <tr><td>spotify_url</td><td>Link to the track (or a search) on Spotify.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="doc-block" id="limits">
+      <h2>Rate limits</h2>
+      {% if rate_limit %}
+      <p>Each IP address can make {{ rate_limit }} requests per minute. Every JSON response includes your remaining quota.</p>
+      <div class="table-wrap" style="margin-top:18px">
+        <table class="table">
+          <thead><tr><th>Header</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>X-RateLimit-Limit</td><td>Requests allowed per minute.</td></tr>
+            <tr><td>X-RateLimit-Remaining</td><td>Requests left in the current window.</td></tr>
+            <tr><td>Retry-After</td><td>Seconds to wait. Only sent with a 429 response.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:14px">If you hit the limit, wait for <code class="inline">Retry-After</code> seconds and try again. Cache search results on your side when you can.</p>
+      {% else %}
+      <p>No rate limit is applied right now. Please keep requests reasonable.</p>
+      {% endif %}
+    </section>
+
+    <section class="doc-block" id="errors">
+      <h2>Errors</h2>
+      <p>Errors use the same JSON body and a matching HTTP status.</p>
+<pre class="code">{
+  <span class="n">"status"</span>: <span class="s">"error"</span>,
+  <span class="n">"code"</span>: 404,
+  <span class="n">"message"</span>: <span class="s">"Track not found"</span>
+}</pre>
+      <div class="table-wrap" style="margin-top:18px">
+        <table class="table">
+          <thead><tr><th>Status</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td>400</td><td>Unknown <code class="inline">source</code> value.</td></tr>
+            <tr><td>404</td><td>No track matched.</td></tr>
+            <tr><td>422</td><td>A parameter is missing or out of range. The message names it.</td></tr>
+            <tr><td>429</td><td>Rate limit reached. See <code class="inline">Retry-After</code>.</td></tr>
+            <tr><td>500</td><td>The audio stream couldn't be started. Try again or pick another track.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:14px">Every response carries an <code class="inline">X-Request-ID</code> header. Include it when you report a problem.</p>
+    </section>
+  </div>
+</div>
+{% endblock %}
